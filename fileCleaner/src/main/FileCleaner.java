@@ -13,7 +13,7 @@ import java.util.List;
  * Class used for cleaning selected files from selected strings.
  * 
  * @author Alban Ménager
- * @version 1.1.2
+ * @version 1.1.2.1
  * 
  */
 public class FileCleaner {
