@@ -15,7 +15,7 @@ import java.util.List;
  * @author Alban Ménager
  * @version 0.1
  * 
- *          For pull request !!!!
+ *          For pull request !!!!!!!!
  */
 public class FileCleaner {
 
