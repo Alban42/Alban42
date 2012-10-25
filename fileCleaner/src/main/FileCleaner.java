@@ -14,6 +14,8 @@ import java.util.List;
  * 
  * @author Alban Ménager
  * @version 0.1
+ * 
+ *          For the issue.
  */
 public class FileCleaner {
 
