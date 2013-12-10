@@ -6,11 +6,12 @@ public class Point {
     return Math.sqrt((_coord.x - _coord0.x) * (_coord.x - _coord0.x) + (_coord.y - _coord0.y) * (_coord.y - _coord0.y));
   }
 
-  public double x, y;
+  public double x, y, length;
 
   public Point(double x, double y) {
     this.x = x;
     this.y = y;
+    this.length = distance(new Point(0, 0), this);
   }
 
   @Override
