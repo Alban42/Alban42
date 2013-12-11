@@ -1,6 +1,6 @@
 package com.alma42.mapgen.biomes;
 
-import com.alma42.mapgen.utils.Zone;
+import com.alma42.mapgen.zone.Zone;
 
 public interface IBiomeManager {
 

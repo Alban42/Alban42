@@ -2,10 +2,10 @@ package com.alma42.mapgen.factories;
 
 import java.util.Random;
 
-import com.alma42.mapgen.zone_selectors.IZoneSelector;
-import com.alma42.mapgen.zone_selectors.implemtations.HexagonZoneSelector;
-import com.alma42.mapgen.zone_selectors.implemtations.RandomZoneSelector;
-import com.alma42.mapgen.zone_selectors.implemtations.SquareZoneSelector;
+import com.alma42.mapgen.zone.selectors.IZoneSelector;
+import com.alma42.mapgen.zone.selectors.implemtations.HexagonZoneSelector;
+import com.alma42.mapgen.zone.selectors.implemtations.RandomZoneSelector;
+import com.alma42.mapgen.zone.selectors.implemtations.SquareZoneSelector;
 
 public class ZoneSelectorFactory {
 

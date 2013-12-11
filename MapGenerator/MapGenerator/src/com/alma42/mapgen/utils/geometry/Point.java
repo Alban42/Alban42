@@ -22,4 +22,11 @@ public class Point {
   public double length() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
+
+  public static Point interpolate(final Point pt1, final Point pt2, final double f) {
+    final double d = pt1.x - pt2.x;
+    final double x = pt2.x + f * d;
+    final double y = pt2.y + (x - pt2.x) * ((pt1.y - pt2.y) / d);
+    return new Point(x, y);
+  }
 }

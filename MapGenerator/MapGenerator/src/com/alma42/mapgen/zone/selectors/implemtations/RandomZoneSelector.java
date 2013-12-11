@@ -1,15 +1,15 @@
 /**
  * 
  */
-package com.alma42.mapgen.zone_selectors.implemtations;
+package com.alma42.mapgen.zone.selectors.implemtations;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.alma42.mapgen.utils.Zone;
 import com.alma42.mapgen.utils.geometry.Center;
 import com.alma42.mapgen.utils.geometry.Point;
-import com.alma42.mapgen.zone_selectors.IZoneSelector;
+import com.alma42.mapgen.zone.Zone;
+import com.alma42.mapgen.zone.selectors.IZoneSelector;
 
 /**
  * @author Alban
@@ -32,5 +32,10 @@ public class RandomZoneSelector implements IZoneSelector {
     }
 
     return zones;
+  }
+
+  @Override
+  public boolean needMoreRandomness() {
+    return false;
   }
 }

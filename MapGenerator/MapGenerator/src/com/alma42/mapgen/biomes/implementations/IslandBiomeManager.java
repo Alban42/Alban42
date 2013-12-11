@@ -2,8 +2,8 @@ package com.alma42.mapgen.biomes.implementations;
 
 import com.alma42.mapgen.biomes.IBiome;
 import com.alma42.mapgen.biomes.IBiomeManager;
-import com.alma42.mapgen.utils.Zone;
 import com.alma42.mapgen.utils.geometry.Center;
+import com.alma42.mapgen.zone.Zone;
 
 public class IslandBiomeManager implements IBiomeManager {
 
