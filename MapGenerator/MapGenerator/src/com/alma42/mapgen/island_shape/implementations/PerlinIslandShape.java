@@ -1,9 +1,9 @@
 /**
  * 
  */
-package com.alma42.mapgen.islandShape.implementations;
+package com.alma42.mapgen.island_shape.implementations;
 
-import com.alma42.mapgen.islandShape.IIslandShape;
+import com.alma42.mapgen.island_shape.IIslandShape;
 import com.alma42.mapgen.utils.geometry.Point;
 import com.alma42.mapgen.utils.perlin.PerlinNoiseGenerator;
 

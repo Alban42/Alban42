@@ -18,7 +18,6 @@ public class Center {
   public boolean           border, ocean, water, coast;
   public double            elevation;
   public double            moisture;
-  public Enum<?>           biome;
   public double            area;
 
   public Center() {
@@ -26,5 +25,35 @@ public class Center {
 
   public Center(Point loc) {
     this.loc = loc;
+  }
+
+  public Edge lookupEdgeFromCenter(Center center) {
+    Edge result = null;
+    for (Edge edge : this.borders) {
+      if (edge.d0.equals(center) || edge.d1.equals(center))
+        result = edge;
+    }
+    return result;
+  }
+
+  // Moisture is the average of the moisture at corners
+  public void assignMoisture() {
+    double sumMoisture;
+    sumMoisture = 0.0;
+    for (Corner corner : this.corners) {
+      if (corner.moisture > 1.0) {
+        corner.moisture = 1.0;
+      }
+      sumMoisture += corner.moisture;
+    }
+    this.moisture = sumMoisture / this.corners.size();
+  }
+
+  public double getX() {
+    return this.loc.x;
+  }
+
+  public double getY() {
+    return this.loc.y;
   }
 }

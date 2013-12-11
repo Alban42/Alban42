@@ -20,4 +20,16 @@ public class Corner {
   public Corner            downslope;
   public int               river;
   public double            moisture;
+
+  public Edge lookupEdgeFromCorner(Corner corner) {
+    Edge result = null;
+
+    for (Edge edge : this.protrudes) {
+      if (edge.v0.equals(corner) || edge.v1.equals(corner)) {
+        result = edge;
+        break;
+      }
+    }
+    return result;
+  }
 }

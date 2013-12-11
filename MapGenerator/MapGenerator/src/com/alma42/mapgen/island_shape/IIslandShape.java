@@ -1,4 +1,4 @@
-package com.alma42.mapgen.islandShape;
+package com.alma42.mapgen.island_shape;
 
 import com.alma42.mapgen.utils.geometry.Point;
 
@@ -12,7 +12,7 @@ import com.alma42.mapgen.utils.geometry.Point;
 public interface IIslandShape {
 
   /**
-   * Factory class to build the 'inside' function that tells us whether
+   * The 'inside' function that tells us whether
    * a point should be on the island or in the water.
    * 
    * @param point
