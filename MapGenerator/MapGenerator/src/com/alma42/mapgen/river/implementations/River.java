@@ -13,9 +13,8 @@ public class River implements IRiverCreator {
   public void createRivers(ArrayList<Corner> corners, int size, Random seed) {
     Corner corner;
     Edge edge;
-
     for (int i = 0; i < size / 2; i++) {
-      corner = corners.get(seed.nextInt() * corners.size() - 1);
+      corner = corners.get(seed.nextInt(corners.size() - 1));
       if (corner.ocean || corner.elevation < 0.3 || corner.elevation > 0.9)
         continue;
       // Bias rivers to go west: if (q.downslope.x > q.x) continue;

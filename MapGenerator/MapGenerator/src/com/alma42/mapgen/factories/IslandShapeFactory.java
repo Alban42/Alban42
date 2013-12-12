@@ -17,7 +17,7 @@ public class IslandShapeFactory {
 
   }
 
-  public static IIslandShape createIslandShape(int type, int seed) {
+  public static IIslandShape createIslandShape(int type, Random seed) {
     IIslandShape islandShape = null;
     switch (type) {
       case PERLIN:
@@ -27,7 +27,7 @@ public class IslandShapeFactory {
         islandShape = new SquareIslandShape();
         break;
       case RADIAL:
-        islandShape = new RadialIslandShape(new Random(seed));
+        islandShape = new RadialIslandShape(seed);
         break;
       default:
         break;

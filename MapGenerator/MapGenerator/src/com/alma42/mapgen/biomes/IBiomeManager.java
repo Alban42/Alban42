@@ -1,9 +1,9 @@
 package com.alma42.mapgen.biomes;
 
-import com.alma42.mapgen.zone.Zone;
+import com.alma42.mapgen.utils.geometry.Center;
 
 public interface IBiomeManager {
 
-  public IBiome assignBiome(Zone zone);
+  public void assignBiome(Center center);
 
 }

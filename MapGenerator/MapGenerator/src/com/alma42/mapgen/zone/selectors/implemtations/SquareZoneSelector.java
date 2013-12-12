@@ -2,24 +2,21 @@ package com.alma42.mapgen.zone.selectors.implemtations;
 
 import java.util.ArrayList;
 
-import com.alma42.mapgen.utils.geometry.Center;
 import com.alma42.mapgen.utils.geometry.Point;
-import com.alma42.mapgen.zone.Zone;
-import com.alma42.mapgen.zone.selectors.IZoneSelector;
+import com.alma42.mapgen.zone.selectors.IPointSelector;
 
-public class SquareZoneSelector implements IZoneSelector {
+public class SquareZoneSelector implements IPointSelector {
 
   @Override
-  public ArrayList<Zone> generateZones(int size, int zoneNumber) {
-    ArrayList<Zone> zones = new ArrayList<Zone>();
+  public ArrayList<Point> generatePoints(int size, int zoneNumber) {
+    ArrayList<Point> points = new ArrayList<Point>();
     double number = Math.sqrt(zoneNumber);
     for (int x = 0; x < number; x++) {
       for (int y = 0; y < number; y++) {
-        zones.add(new Zone(new Center(new Point((0.5 + x) / number * size, (0.5 + y) / number * size)), size
-            / zoneNumber));
+        points.add(new Point((0.5 + x) / number * size, (0.5 + y) / number * size));
       }
     }
-    return zones;
+    return points;
   }
 
   @Override

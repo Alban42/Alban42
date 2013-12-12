@@ -3,6 +3,8 @@
  */
 package com.alma42.mapgen.island_shape.implementations;
 
+import java.util.Random;
+
 import com.alma42.mapgen.island_shape.IIslandShape;
 import com.alma42.mapgen.utils.geometry.Point;
 import com.alma42.mapgen.utils.perlin.PerlinNoiseGenerator;
@@ -15,7 +17,7 @@ public class PerlinIslandShape implements IIslandShape {
 
   private PerlinNoiseGenerator perlin;
 
-  public PerlinIslandShape(int seed) {
+  public PerlinIslandShape(Random seed) {
     this.perlin = new PerlinNoiseGenerator(seed);
   }
 
@@ -29,6 +31,6 @@ public class PerlinIslandShape implements IIslandShape {
     final double c = (this.perlin.noise2(
         Float.valueOf(String.valueOf((point.x + 1) * 128)),
         Float.valueOf(String.valueOf((point.y + 1) * 128)))) / 255.0;
-    return c > (0.3 + 0.3 * point.length * point.length);
+    return c > (0.3 + 0.3 * point.length() * point.length());
   }
 }

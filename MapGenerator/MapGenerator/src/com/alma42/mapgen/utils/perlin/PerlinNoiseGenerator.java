@@ -39,7 +39,6 @@ public class PerlinNoiseGenerator
   private static final int   NM                  = 0xfff;
 
   /** Default seed to use for the random number generation */
-  private static final int   DEFAULT_SEED        = 100;
 
   /** Default sample size to work with */
   private static final int   DEFAULT_SAMPLE_SIZE = 256;
@@ -57,25 +56,16 @@ public class PerlinNoiseGenerator
   private float[]            g1;
 
   /**
-   * Create a new noise creator with the default seed value
-   */
-  public PerlinNoiseGenerator()
-  {
-    this(DEFAULT_SEED);
-  }
-
-  /**
    * Create a new noise creator with the given seed value for the randomness
    * 
    * @param seed
    *          The seed value to use
    */
-  public PerlinNoiseGenerator(int seed)
+  public PerlinNoiseGenerator(Random rand)
   {
     p_imp = new int[DEFAULT_SAMPLE_SIZE << 1];
 
     int i, j, k;
-    Random rand = new Random(seed);
 
     // Calculate the table of psuedo-random coefficients.
     for (i = 0; i < DEFAULT_SAMPLE_SIZE; i++)

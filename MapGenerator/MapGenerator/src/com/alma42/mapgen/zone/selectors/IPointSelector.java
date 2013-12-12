@@ -2,18 +2,18 @@ package com.alma42.mapgen.zone.selectors;
 
 import java.util.ArrayList;
 
-import com.alma42.mapgen.zone.Zone;
+import com.alma42.mapgen.utils.geometry.Point;
 
-public interface IZoneSelector {
+public interface IPointSelector {
 
   /**
    * Generate a square grid of point of : {@code size x size}.
    * 
    * @param size
    *          the size of the grid (the grid will {@code size x size}).
-   * @return an {@link ArrayList} of {@link Zone}.
+   * @return an {@link ArrayList} of {@link Point}.
    */
-  public ArrayList<Zone> generateZones(int size, int zoneNumber);
+  public ArrayList<Point> generatePoints(int size, int pointNumber);
 
   /**
    * The square and hex grid point selection remove randomness from

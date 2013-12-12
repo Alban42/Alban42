@@ -7,7 +7,7 @@ public class RiverCreatorFactory {
 
   public static final int RIVER = 0;
 
-  public IRiverCreator createRiverCreator(int type) {
+  public static IRiverCreator createRiverCreator(int type) {
     IRiverCreator riverCreator = null;
 
     switch (type) {

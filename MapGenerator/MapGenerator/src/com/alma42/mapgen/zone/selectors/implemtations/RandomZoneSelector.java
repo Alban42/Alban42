@@ -6,16 +6,14 @@ package com.alma42.mapgen.zone.selectors.implemtations;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.alma42.mapgen.utils.geometry.Center;
 import com.alma42.mapgen.utils.geometry.Point;
-import com.alma42.mapgen.zone.Zone;
-import com.alma42.mapgen.zone.selectors.IZoneSelector;
+import com.alma42.mapgen.zone.selectors.IPointSelector;
 
 /**
  * @author Alban
  * 
  */
-public class RandomZoneSelector implements IZoneSelector {
+public class RandomZoneSelector implements IPointSelector {
 
   private Random seed;
 
@@ -24,14 +22,14 @@ public class RandomZoneSelector implements IZoneSelector {
   }
 
   @Override
-  public ArrayList<Zone> generateZones(int size, int zoneNumber) {
-    ArrayList<Zone> zones = new ArrayList<Zone>();
+  public ArrayList<Point> generatePoints(int size, int zoneNumber) {
+    ArrayList<Point> points = new ArrayList<Point>();
     for (int i = 0; i < zoneNumber; i++) {
-      zones.add(new Zone(new Center(new Point((this.seed.nextDouble() * size - 10) + 10,
-          (this.seed.nextDouble() * size - 10) + 10)), size / zoneNumber));
+      points.add(new Point((seed.nextDouble() * size - 10) + 10,
+          (seed.nextDouble() * size - 10) + 10));
     }
 
-    return zones;
+    return points;
   }
 
   @Override

@@ -2,6 +2,8 @@ package com.alma42.mapgen.utils.geometry;
 
 import java.util.ArrayList;
 
+import com.alma42.mapgen.biomes.IBiome;
+
 /**
  * @author Alban
  * 
@@ -11,7 +13,7 @@ import java.util.ArrayList;
 public class Center {
 
   public int               index;
-  public Point             loc;
+  public Point             point;
   public ArrayList<Corner> corners   = new ArrayList<Corner>(); // set of polygon corners
   public ArrayList<Center> neighbors = new ArrayList<Center>(); // set of adjacent polygons
   public ArrayList<Edge>   borders   = new ArrayList<Edge>();  // set of bordering edges
@@ -19,12 +21,13 @@ public class Center {
   public double            elevation;
   public double            moisture;
   public double            area;
+  public IBiome<?>         biome;
 
   public Center() {
   }
 
-  public Center(Point loc) {
-    this.loc = loc;
+  public Center(Point point) {
+    this.point = point;
   }
 
   public Edge lookupEdgeFromCenter(Center center) {
@@ -36,24 +39,12 @@ public class Center {
     return result;
   }
 
-  // Moisture is the average of the moisture at corners
-  public void assignMoisture() {
-    double sumMoisture;
-    sumMoisture = 0.0;
-    for (Corner corner : this.corners) {
-      if (corner.moisture > 1.0) {
-        corner.moisture = 1.0;
-      }
-      sumMoisture += corner.moisture;
-    }
-    this.moisture = sumMoisture / this.corners.size();
-  }
-
   public double getX() {
-    return this.loc.x;
+    return this.point.x;
   }
 
   public double getY() {
-    return this.loc.y;
+    return this.point.y;
   }
+
 }

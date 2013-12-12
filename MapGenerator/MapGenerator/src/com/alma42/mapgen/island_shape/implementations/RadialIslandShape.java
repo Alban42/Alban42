@@ -34,7 +34,7 @@ public class RadialIslandShape implements IIslandShape {
   @Override
   public boolean isInside(Point point) {
     double angle = Math.atan2(point.y, point.x);
-    double length = 0.5 * (Math.max(Math.abs(point.x), Math.abs(point.y)) + point.length);
+    double length = 0.5 * (Math.max(Math.abs(point.x), Math.abs(point.y)) + point.length());
 
     double r1 = 0.5 + 0.40 * Math.sin(this.startAngle + this.bumps * angle + Math.cos((this.bumps + 3) * angle));
     double r2 = 0.7 - 0.20 * Math.sin(this.startAngle + this.bumps * angle - Math.sin((this.bumps + 2) * angle));

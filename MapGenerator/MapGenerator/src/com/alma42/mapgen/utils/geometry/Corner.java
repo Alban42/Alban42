@@ -12,7 +12,7 @@ public class Corner {
   public ArrayList<Center> touches   = new ArrayList<Center>(); // set of polygons touching this corner
   public ArrayList<Corner> adjacent  = new ArrayList<Corner>(); // set of corners connected to this one
   public ArrayList<Edge>   protrudes = new ArrayList<Edge>();  // set of edges touching the corner
-  public Point             loc;
+  public Point             point;
   public int               index, watershed_size;
   public boolean           border;
   public double            elevation;

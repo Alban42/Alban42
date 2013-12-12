@@ -14,7 +14,7 @@ public class BiomeManagerFactory {
 
   public static final int ISLAND = 0;
 
-  public IBiomeManager createBiomeManager(int type) {
+  public static IBiomeManager createBiomeManager(int type) {
     IBiomeManager biomeManager = null;
     switch (type) {
       case ISLAND:
