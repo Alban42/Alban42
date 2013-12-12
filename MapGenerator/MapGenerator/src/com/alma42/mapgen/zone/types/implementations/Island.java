@@ -127,24 +127,24 @@ public class Island implements IZoneType {
     Point point;
 
     // First we compute the average of the centers next to each corner.
-    for (Corner q : this.graph.getCorners()) {
-      if (q.border) {
-        newCorners.add(q.index, q.point);
+    for (Corner corner : this.graph.getCorners()) {
+      if (corner.border) {
+        newCorners.add(corner.index, corner.point);
       } else {
         point = new Point(0.0, 0.0);
-        for (Center r : q.touches) {
-          point.x += r.point.x;
-          point.y += r.point.y;
+        for (Center center : corner.touches) {
+          point.x += center.point.x;
+          point.y += center.point.y;
         }
-        point.x /= q.touches.size();
-        point.y /= q.touches.size();
-        newCorners.add(q.index, point);
+        point.x /= corner.touches.size();
+        point.y /= corner.touches.size();
+        newCorners.add(corner.index, point);
       }
     }
 
     // Move the corners to the new locations.
-    for (int i = 0; i < this.graph.getCorners().size(); i++) {
-      this.graph.getCorners().get(i).point = newCorners.get(i);
+    for (Corner corner : this.graph.getCorners()) {
+      corner.point = newCorners.get(corner.index);
     }
 
     // The edge midpoints were computed for the old corners and need
@@ -162,9 +162,9 @@ public class Island implements IZoneType {
    */
   private ArrayList<Corner> landCorners(ArrayList<Corner> corners) {
     ArrayList<Corner> locations = new ArrayList<Corner>();
-    for (Corner q : this.graph.getCorners()) {
-      if (!q.ocean && !q.coast) {
-        locations.add(q);
+    for (Corner corner : this.graph.getCorners()) {
+      if (!corner.ocean && !corner.coast) {
+        locations.add(corner);
       }
     }
     return locations;
@@ -233,7 +233,7 @@ public class Island implements IZoneType {
    * Specifically, we want elevation X to have frequency (1-X). To do this we will sort the corners, then set each
    * corner to its desired elevation.
    */
-  private static void redistributeElevations(ArrayList<Corner> locations) {
+  private void redistributeElevations(ArrayList<Corner> locations) {
     // SCALE_FACTOR increases the mountain area. At 1.0 the maximum
     // elevation barely shows up on the map, so we set it to 1.1.
     double SCALE_FACTOR = 1.1;
@@ -245,7 +245,7 @@ public class Island implements IZoneType {
       // Let y(x) be the total area that we want at elevation <= x.
       // We want the higher elevations to occur less than lower
       // ones, and set the area to be y(x) = 1 - (1-x)^2.
-      y = i / (locations.size() - 1);
+      y = i / (locations.size());
       // Now we have to solve for x, given the known y.
       // * y = 1 - (1-x)^2
       // * y = 1 - (1 - 2x + x^2)
@@ -253,9 +253,14 @@ public class Island implements IZoneType {
       // * x^2 - 2x + y = 0
       // From this we can use the quadratic equation to get:
       x = Math.sqrt(SCALE_FACTOR) - Math.sqrt(SCALE_FACTOR * (1 - y));
-      if (x > 1.0)
-        x = 1.0; // TODO: does this break downslopes?
+      x = Math.min(x,1);
       locations.get(i).elevation = x;
+    }
+    
+    for(Corner corner : this.graph.getCorners()){
+      if(corner.ocean || corner.coast){
+        corner.elevation = 0.0;
+      }
     }
   }
 
@@ -264,7 +269,7 @@ public class Island implements IZoneType {
 
     Collections.sort(locations, new MoistureComparator());
     for (int i = 0; i < locations.size(); i++) {
-      locations.get(i).moisture = i / (locations.size() - 1);
+      locations.get(i).moisture = i / (locations.size());
     }
   }
 
@@ -400,14 +405,14 @@ public class Island implements IZoneType {
    */
   private void assignMoisture() {
     double sumMoisture;
-    for (Center p : this.graph.getCenters()) {
+    for (Center center : this.graph.getCenters()) {
       sumMoisture = 0.0;
-      for (Corner q : p.corners) {
+      for (Corner q : center.corners) {
         if (q.moisture > 1.0)
           q.moisture = 1.0;
         sumMoisture += q.moisture;
       }
-      p.moisture = sumMoisture / p.corners.size();
+      center.moisture = sumMoisture / center.corners.size();
     }
   }
 

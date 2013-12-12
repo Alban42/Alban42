@@ -11,7 +11,7 @@ public class LocationComparator implements Comparator<Corner> {
     int result = 0;
     if (arg0.elevation < arg1.elevation) {
       result = -1;
-    } else if (arg0.elevation < arg1.elevation) {
+    } else if (arg0.elevation > arg1.elevation) {
       result = 1;
     }
     return result;

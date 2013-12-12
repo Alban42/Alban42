@@ -12,12 +12,12 @@ public class Test {
    * @param args
    */
   public static void main(String[] args) {
-    int size = 600;
+    int size = 800;
     int pointNumber = 10000;
     int seed = (int) System.nanoTime();
-    int pointSelectorType = PointSelectorFactory.SQUARE;
+    int pointSelectorType = PointSelectorFactory.RANDOM;
     int graphType = GraphFactory.VORONOI;
-    int islandShapeType = IslandShapeFactory.PERLIN;
+    int islandShapeType = IslandShapeFactory.RADIAL;
     int riverCreatorType = RiverCreatorFactory.RIVER;
     int biomeManagerType = BiomeManagerFactory.ISLAND;
     Map map = new Map(size, pointNumber, seed, pointSelectorType, graphType, islandShapeType, riverCreatorType,

@@ -11,7 +11,7 @@ public class MoistureComparator implements Comparator<Corner> {
     int result = 0;
     if (arg0.moisture < arg1.moisture) {
       result = -1;
-    } else if (arg0.moisture < arg1.moisture) {
+    } else if (arg0.moisture > arg1.moisture) {
       result = 1;
     }
     return result;

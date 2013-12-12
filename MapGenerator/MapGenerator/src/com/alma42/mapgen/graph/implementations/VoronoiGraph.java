@@ -30,7 +30,7 @@ public class VoronoiGraph implements IGraph {
 
   @Override
   public void buildGraph(ArrayList<Point> points) {
-    points = this.voronoi.siteCoords();
+    this.voronoi.siteCoords();
     this.voronoi = new Voronoi(points, null, this.voronoi.get_plotBounds());
     final HashMap<Point, Center> pointCenterMap = new HashMap<Point, Center>();
     points = this.voronoi.siteCoords();
@@ -143,14 +143,7 @@ public class VoronoiGraph implements IGraph {
     if (point == null) {
       return null;
     }
-    // for (bucket = (int) ((point.x) - 1); bucket <= (point.x) + 1; bucket++) {
-    // q = pointCornerMap.get(bucket);
-    // double dx = point.x - q.point.x;
-    // double dy = point.y - q.point.y;
-    // if (dx * dx + dy * dy < 1e-6) {
-    // return q;
-    // }
-    // }
+    
     index = (int) point.x + ((int) (point.y) * this.size * 2);
     corner = pointCornerMap.get(index);
     if (corner == null) {
