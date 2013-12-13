@@ -1,13 +1,13 @@
 /**
  * 
  */
-package com.alma42.mapgen.zone.selectors.implemtations;
+package com.alma42.mapgen.point.implemtations;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.alma42.mapgen.point.IPointSelector;
 import com.alma42.mapgen.utils.geometry.Point;
-import com.alma42.mapgen.zone.selectors.IPointSelector;
 
 /**
  * @author Alban
@@ -25,8 +25,8 @@ public class RandomZoneSelector implements IPointSelector {
   public ArrayList<Point> generatePoints(int size, int zoneNumber) {
     ArrayList<Point> points = new ArrayList<Point>();
     for (int i = 0; i < zoneNumber; i++) {
-      points.add(new Point((seed.nextDouble() * size - 10) + 10,
-          (seed.nextDouble() * size - 10) + 10));
+      points.add(new Point((this.seed.nextDouble() * size - 10) + 10,
+          (this.seed.nextDouble() * size - 10) + 10));
     }
 
     return points;

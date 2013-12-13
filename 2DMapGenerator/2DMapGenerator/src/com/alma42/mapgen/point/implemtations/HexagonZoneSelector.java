@@ -1,9 +1,9 @@
-package com.alma42.mapgen.zone.selectors.implemtations;
+package com.alma42.mapgen.point.implemtations;
 
 import java.util.ArrayList;
 
+import com.alma42.mapgen.point.IPointSelector;
 import com.alma42.mapgen.utils.geometry.Point;
-import com.alma42.mapgen.zone.selectors.IPointSelector;
 
 public class HexagonZoneSelector implements IPointSelector {
 

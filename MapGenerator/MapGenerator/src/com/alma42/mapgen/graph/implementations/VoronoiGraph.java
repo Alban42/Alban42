@@ -9,6 +9,7 @@ import com.alma42.mapgen.utils.geometry.Center;
 import com.alma42.mapgen.utils.geometry.Corner;
 import com.alma42.mapgen.utils.geometry.Edge;
 import com.alma42.mapgen.utils.geometry.Point;
+import com.alma42.mapgen.utils.geometry.Rectangle;
 import com.alma42.mapgen.utils.voronoi.LineSegment;
 import com.alma42.mapgen.utils.voronoi.Voronoi;
 
@@ -20,20 +21,48 @@ public class VoronoiGraph implements IGraph {
   private ArrayList<Corner> corners;
   private ArrayList<Edge>   edges;
   private Voronoi           voronoi;
+  private Rectangle         bounds;
 
   public VoronoiGraph(int size, Random seed, int pointNumber) {
     this.centers = new ArrayList<Center>();
     this.corners = new ArrayList<Corner>();
     this.edges = new ArrayList<Edge>();
-    this.voronoi = new Voronoi(pointNumber, size, size, seed, null);
+    // this.voronoi = new Voronoi(pointNumber, size, size, seed, null);
+    // this.bounds = this.voronoi.get_plotBounds();
+    // lloydRelaxation();
+  }
+
+  private void lloydRelaxation() {
+    int numLloydRelaxations = 2;
+    ArrayList<Point> points = null;
+    for (int i = 0; i < numLloydRelaxations; i++) {
+      points = this.voronoi.siteCoords();
+      for (final Point p : points) {
+        final ArrayList<Point> region = this.voronoi.region(p);
+        double x = 0;
+        double y = 0;
+        for (final Point c : region) {
+          x += c.x;
+          y += c.y;
+        }
+        x /= region.size();
+        y /= region.size();
+        p.x = x;
+        p.y = y;
+      }
+      this.voronoi = new Voronoi(points, null, this.bounds);
+    }
   }
 
   @Override
   public void buildGraph(ArrayList<Point> points) {
-    this.voronoi.siteCoords();
-    this.voronoi = new Voronoi(points, null, this.voronoi.get_plotBounds());
-    final HashMap<Point, Center> pointCenterMap = new HashMap<Point, Center>();
+    // ArrayList<Point> points = null;
+    this.voronoi = new Voronoi(points, null);
+    this.bounds = this.voronoi.get_plotBounds();
+    lloydRelaxation();
     points = this.voronoi.siteCoords();
+
+    final HashMap<Point, Center> centerLookup = new HashMap<Point, Center>();
     Center newCenter;
 
     // Build Center objects for each of the points, and a lookup map
@@ -43,7 +72,7 @@ public class VoronoiGraph implements IGraph {
       newCenter.index = this.centers.size();
       newCenter.point = point;
       this.centers.add(newCenter);
-      pointCenterMap.put(point, newCenter);
+      centerLookup.put(point, newCenter);
     }
 
     // Workaround for Voronoi lib bug: we need to call region()
@@ -56,8 +85,8 @@ public class VoronoiGraph implements IGraph {
     final HashMap<Integer, Corner> pointCornerMap = new HashMap<Integer, Corner>();
 
     for (final com.alma42.mapgen.utils.voronoi.Edge libedge : libedges) {
-      final LineSegment vEdge = libedge.voronoiEdge();
       final LineSegment dEdge = libedge.delaunayLine();
+      final LineSegment vEdge = libedge.voronoiEdge();
 
       // Fill the graph data. Make an Edge object corresponding to
       // the edge from the voronoi library.
@@ -69,8 +98,8 @@ public class VoronoiGraph implements IGraph {
       // Edges point to corners. Edges point to centers.
       edge.v0 = makeCorner(pointCornerMap, vEdge.p0);
       edge.v1 = makeCorner(pointCornerMap, vEdge.p1);
-      edge.d0 = pointCenterMap.get(dEdge.p0);
-      edge.d1 = pointCenterMap.get(dEdge.p1);
+      edge.d0 = centerLookup.get(dEdge.p0);
+      edge.d1 = centerLookup.get(dEdge.p1);
 
       // Centers point to edges. Corners point to edges.
       if (edge.d0 != null) {
@@ -134,7 +163,15 @@ public class VoronoiGraph implements IGraph {
     }
   }
 
-  // ensures that each corner is represented by only one corner object
+  /**
+   * The Voronoi library generates multiple Point objects for corners, and we need to canonicalize to one Corner object.
+   * To make lookup fast, we keep an array of Points, bucketed by x value, and then we only have to look at other Points
+   * in nearby buckets. When we fail to find one, we'll create a new Corner object.
+   * 
+   * @param pointCornerMap
+   * @param point
+   * @return
+   */
   private Corner makeCorner(final HashMap<Integer, Corner> pointCornerMap,
       final Point point) {
     Corner corner;
@@ -143,7 +180,7 @@ public class VoronoiGraph implements IGraph {
     if (point == null) {
       return null;
     }
-    
+
     index = (int) point.x + ((int) (point.y) * this.size * 2);
     corner = pointCornerMap.get(index);
     if (corner == null) {
@@ -187,6 +224,11 @@ public class VoronoiGraph implements IGraph {
   @Override
   public ArrayList<Edge> getEdges() {
     return this.edges;
+  }
+
+  @Override
+  public Rectangle getBounds() {
+    return this.bounds;
   }
 
 }

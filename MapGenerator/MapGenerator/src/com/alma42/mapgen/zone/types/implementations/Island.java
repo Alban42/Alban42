@@ -13,12 +13,13 @@ import com.alma42.mapgen.factories.PointSelectorFactory;
 import com.alma42.mapgen.factories.RiverCreatorFactory;
 import com.alma42.mapgen.graph.IGraph;
 import com.alma42.mapgen.island_shape.IIslandShape;
+import com.alma42.mapgen.point.IPointSelector;
 import com.alma42.mapgen.river.IRiverCreator;
 import com.alma42.mapgen.utils.geometry.Center;
 import com.alma42.mapgen.utils.geometry.Corner;
 import com.alma42.mapgen.utils.geometry.Edge;
 import com.alma42.mapgen.utils.geometry.Point;
-import com.alma42.mapgen.zone.selectors.IPointSelector;
+import com.alma42.mapgen.utils.geometry.Rectangle;
 import com.alma42.mapgen.zone.types.IZoneType;
 
 public class Island implements IZoneType {
@@ -93,7 +94,7 @@ public class Island implements IZoneType {
     // Polygon elevations are the average of their corners
     assignElevations();
 
-    System.out.println("Assign moisture ...");
+    System.out.println("Assign downslopes ...");
     // Determine downslope paths.
     calculateDownslopes();
 
@@ -102,6 +103,7 @@ public class Island implements IZoneType {
     calculateWatersheds();
 
     // Create rivers.
+    System.out.println("Create River ...");
     createRivers();
 
     // Determine moisture at corners, starting at rivers
@@ -111,7 +113,9 @@ public class Island implements IZoneType {
     // of the corner moisture.
     assignCornerMoisture();
     redistributeMoisture(landCorners(this.graph.getCorners()));
+    System.out.println("Assign moisture ...");
     assignMoisture();
+    System.out.println("Assign biomes ...");
     assignBiomes();
   }
 
@@ -253,12 +257,12 @@ public class Island implements IZoneType {
       // * x^2 - 2x + y = 0
       // From this we can use the quadratic equation to get:
       x = Math.sqrt(SCALE_FACTOR) - Math.sqrt(SCALE_FACTOR * (1 - y));
-      x = Math.min(x,1);
+      x = Math.min(x, 1);
       locations.get(i).elevation = x;
     }
-    
-    for(Corner corner : this.graph.getCorners()){
-      if(corner.ocean || corner.coast){
+
+    for (Corner corner : this.graph.getCorners()) {
+      if (corner.ocean || corner.coast) {
         corner.elevation = 0.0;
       }
     }
@@ -495,5 +499,10 @@ public class Island implements IZoneType {
     for (Center center : this.graph.getCenters()) {
       this.biomeManager.assignBiome(center);
     }
+  }
+
+  @Override
+  public Rectangle getBounds() {
+    return this.getGraph().getBounds();
   }
 }
