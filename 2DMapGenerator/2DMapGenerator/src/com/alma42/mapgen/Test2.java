@@ -6,7 +6,7 @@ import java.util.Random;
 import com.alma42.mapgen.factories.IslandShapeFactory;
 import com.alma42.mapgen.factories.PointSelectorFactory;
 import com.alma42.mapgen.island_shape.IIslandShape;
-import com.alma42.mapgen.point.IPointSelector;
+import com.alma42.mapgen.point.APointSelector;
 import com.alma42.mapgen.utils.geometry.Point;
 
 public class Test2 {
@@ -19,7 +19,7 @@ public class Test2 {
     int islandShapeType = IslandShapeFactory.RADIAL;
 
     Random random = new Random(seed);
-    IPointSelector pointSelector = PointSelectorFactory.createPointSelector(pointSelectorType, random);
+    APointSelector pointSelector = PointSelectorFactory.createPointSelector(pointSelectorType, random);
     IIslandShape islandShape = IslandShapeFactory.createIslandShape(islandShapeType, random, size);
 
     ArrayList<Point> points = pointSelector.generatePoints(size, pointNumber);
