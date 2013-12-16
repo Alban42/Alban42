@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alma42.mapgen.biomes.implementations;
+package com.alma42.mapgen.biomes.implementations.island;
 
 import java.awt.Color;
 

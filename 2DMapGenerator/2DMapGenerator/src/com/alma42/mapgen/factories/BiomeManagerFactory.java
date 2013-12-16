@@ -4,7 +4,7 @@
 package com.alma42.mapgen.factories;
 
 import com.alma42.mapgen.biomes.IBiomeManager;
-import com.alma42.mapgen.biomes.implementations.IslandBiomeManager;
+import com.alma42.mapgen.biomes.implementations.island.IslandBiomeManager;
 
 /**
  * @author Alban

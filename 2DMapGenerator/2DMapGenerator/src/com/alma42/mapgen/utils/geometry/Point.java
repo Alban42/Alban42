@@ -9,14 +9,14 @@ public class Point {
     return new Point(x, y);
   }
 
-  public double  x, y;
+  public double        x, y;
 
-  private double length;
+  private final double length;
 
   public Point(final double x, final double y) {
     this.x = x;
     this.y = y;
-    // this.length = Trigonometry.distance(new Point(0, 0), this);
+    this.length = Math.sqrt((this.x * this.x) + (this.y * this.y));
   }
 
   public double l2() {
@@ -24,7 +24,7 @@ public class Point {
   }
 
   public double length() {
-    return Math.sqrt((this.x * this.x) + (this.y * this.y));
+    return this.length;
   }
 
   /*

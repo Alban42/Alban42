@@ -6,15 +6,15 @@ public class Coordinates {
     N, NE, E, SE, S, SW, W, NW, R, L;
   }
 
-  private final int x;
-  private final int y;
-  private Position  position;
+  private final double x;
+  private final double y;
+  private Position     position;
 
   /**
    * @param x
    * @param y
    */
-  public Coordinates(final int x, final int y) {
+  public Coordinates(final double x, final double y) {
     this.x = x;
     this.y = y;
     this.position = null;
@@ -24,7 +24,7 @@ public class Coordinates {
    * @param x
    * @param y
    */
-  public Coordinates(final int x, final int y, final Position position) {
+  public Coordinates(final double x, final double y, final Position position) {
     this(x, y);
     this.position = position;
   }
@@ -65,14 +65,14 @@ public class Coordinates {
   /**
    * @return the x
    */
-  public int getX() {
+  public double getX() {
     return this.x;
   }
 
   /**
    * @return the y
    */
-  public int getY() {
+  public double getY() {
     return this.y;
   }
 

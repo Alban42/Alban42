@@ -1,11 +1,11 @@
-package com.alma42.mapgen.biomes.implementations;
+package com.alma42.mapgen.biomes.implementations.island;
 
 import java.awt.Color;
 
 import com.alma42.mapgen.biomes.IBiome;
 import com.alma42.mapgen.biomes.IBiomeManager;
-import com.alma42.mapgen.biomes.implementations.IslandBiome.ColorData;
-import com.alma42.mapgen.grid.shape.AShape;
+import com.alma42.mapgen.biomes.implementations.island.IslandBiome.ColorData;
+import com.alma42.mapgen.grid.shape.Shape;
 import com.alma42.mapgen.utils.geometry.Center;
 
 public class IslandBiomeManager implements IBiomeManager {
@@ -69,7 +69,7 @@ public class IslandBiomeManager implements IBiomeManager {
   }
 
   @Override
-  public IBiome<ColorData> getBiome(final AShape aShape) {
+  public IBiome<ColorData> getBiome(final Shape aShape) {
 
     return null;
   }
