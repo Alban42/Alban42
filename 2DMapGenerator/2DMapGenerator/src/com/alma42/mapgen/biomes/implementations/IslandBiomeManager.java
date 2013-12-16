@@ -69,7 +69,7 @@ public class IslandBiomeManager implements IBiomeManager {
   }
 
   @Override
-  public IBiome getBiome(final AShape aShape) {
+  public IBiome<ColorData> getBiome(final AShape aShape) {
 
     return null;
   }
