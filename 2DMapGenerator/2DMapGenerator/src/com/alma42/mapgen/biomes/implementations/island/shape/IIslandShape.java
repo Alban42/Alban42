@@ -1,4 +1,4 @@
-package com.alma42.mapgen.island_shape;
+package com.alma42.mapgen.biomes.implementations.island.shape;
 
 import com.alma42.mapgen.utils.geometry.Point;
 

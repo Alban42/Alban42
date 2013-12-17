@@ -1,10 +1,13 @@
 package com.alma42.mapgen.grid;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.alma42.mapgen.grid.coordinate.Coordinates;
 import com.alma42.mapgen.grid.shape.Shape;
+import com.alma42.mapgen.utils.geometry.Corner;
 import com.alma42.mapgen.utils.geometry.Point;
 
 public class Grid extends AGridComponent {
@@ -19,8 +22,17 @@ public class Grid extends AGridComponent {
   public Grid(final Grid parent, final Coordinates coordinates, final Point center, final double size,
       final int shapeNumber) {
     super(parent, coordinates, center, size);
-    this.childs = new TreeMap<Coordinates, AGridComponent>(this.coordinateComparator);
+    this.childs = new TreeMap<Coordinates, AGridComponent>(this.coordinateChildComparator);
     this.shapeNumber = shapeNumber;
+    populate();
+  }
+
+  public List<Corner> getAllCorners() {
+    final Map<Coordinates, Corner> corners = new TreeMap<>(this.coordinateChildComparator);
+    for (final AGridComponent component : getChilds().values()) {
+      corners.putAll(component.getCorners());
+    }
+    return new LinkedList<Corner>(corners.values());
   }
 
   public AGridComponent getChild(final Coordinates coordinates) {
@@ -41,7 +53,7 @@ public class Grid extends AGridComponent {
     return this.size;
   }
 
-  public void populate() {
+  private void populate() {
     if (this.childs.size() == 0) {
       Point point;
       Coordinates coordinates;

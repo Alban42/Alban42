@@ -1,5 +1,7 @@
 package com.alma42.mapgen.utils.geometry;
 
+import com.alma42.mapgen.grid.AGridComponent;
+
 /**
  * 
  * @author Alban
@@ -7,15 +9,70 @@ package com.alma42.mapgen.utils.geometry;
  */
 public class Edge {
 
-  public int    index;
-  public Center d0, d1;  // Delaunay edge
-  public Corner v0, v1;  // Voronoi edge
-  public Point  midpoint; // halfway between v0,v1
-  public int    river;
+  private final AGridComponent parent;
+  private final Corner         corner1, corner2;
 
-  public void setVornoi(Corner v0, Corner v1) {
-    this.v0 = v0;
-    this.v1 = v1;
-    this.midpoint = new Point((v0.point.x + v1.point.x) / 2, (v0.point.y + v1.point.y) / 2);
+  private boolean              border;
+
+  /**
+   * @param corner1
+   * @param corner2
+   */
+  public Edge(final AGridComponent parent, final Corner corner1, final Corner corner2) {
+    this(parent, corner1, corner2, false);
   }
+
+  public Edge(final AGridComponent parent, final Corner corner1, final Corner corner2, final boolean border) {
+    this.parent = parent;
+    this.corner1 = corner1;
+    this.corner2 = corner2;
+    this.border = border;
+  }
+
+  /**
+   * @return the corner1
+   */
+  public Corner getCorner1() {
+    return this.corner1;
+  }
+
+  /**
+   * @return the corner2
+   */
+  public Corner getCorner2() {
+    return this.corner2;
+  }
+
+  /**
+   * @return the parent
+   */
+  public AGridComponent getParent() {
+    return this.parent;
+  }
+
+  /**
+   * @return the border
+   */
+  public boolean isBorder() {
+    return this.border;
+  }
+
+  /**
+   * @param border
+   *          the border to set
+   */
+  public void setBorder(final boolean border) {
+    this.border = border;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Edge [corner1=" + this.corner1 + ", corner2=" + this.corner2 + ", border=" + this.border + "]";
+  }
+
 }

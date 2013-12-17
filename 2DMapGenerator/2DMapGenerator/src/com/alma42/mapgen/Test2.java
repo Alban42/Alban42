@@ -1,12 +1,15 @@
 package com.alma42.mapgen;
 
+import java.util.Map;
 import java.util.Random;
 
-import com.alma42.mapgen.factories.BiomeManagerFactory;
-import com.alma42.mapgen.factories.IslandShapeFactory;
+import com.alma42.mapgen.biomes.factory.BiomeManagerFactory;
+import com.alma42.mapgen.biomes.implementations.island.shape.IIslandShape;
+import com.alma42.mapgen.biomes.implementations.island.shape.factory.IslandShapeFactory;
 import com.alma42.mapgen.grid.AGridComponent;
 import com.alma42.mapgen.grid.Grid;
-import com.alma42.mapgen.island_shape.IIslandShape;
+import com.alma42.mapgen.grid.coordinate.Coordinates;
+import com.alma42.mapgen.utils.geometry.Corner;
 import com.alma42.mapgen.utils.geometry.Point;
 
 public class Test2 {
@@ -17,7 +20,11 @@ public class Test2 {
   }
 
   public static void main(final String[] args) {
-    final int size = 600;
+    testMapGen();
+  }
+
+  private static void testMapGen() {
+    final int size = 100;
     final int shapeNumber = 10000;
     final int seed = (int) System.nanoTime();
     final int islandShapeType = IslandShapeFactory.RADIAL;
@@ -27,9 +34,8 @@ public class Test2 {
     final IIslandShape islandShape = IslandShapeFactory.createIslandShape(islandShapeType, random, size);
 
     final Grid grid = new Grid(size, shapeNumber);
-    grid.populate();
     System.out.println("NUMBER : " + grid.getChilds().size());
-    int x = -1;
+    double x = -1;
     String result = "";
     for (final AGridComponent child : grid.getChilds().values()) {
       if (child.getCoordinates().getX() != x) {
@@ -45,5 +51,21 @@ public class Test2 {
     }
 
     System.out.println(result);
+    final AGridComponent child = grid.getChild(new Coordinates(1, 1));
+    System.out.println("CHILD : " + child.toString());
+    final Map<Coordinates, Corner> corners = child.getCorners();
+    System.out.println("CORNERS : " + corners.values().toString());
+    for (final Coordinates coord : corners.keySet()) {
+      System.out.print("Coordinates : " + coord.toString());
+      System.out.println(corners.get(coord).getAdjacents().toString());
+    }
+    // System.out.println("CORNERS : " + corners.toString());
+    // final Map<Coordinates, AGridComponent> neighbors = child.getNeighbors();
+    // System.out.println("NEIGHBORS : " + neighbors.toString());
+    // final Map<Coordinates, Edge> borders = child.getBorders();
+    // for (final Coordinates coord : borders.keySet()) {
+    // System.out.print("Coordinates : " + coord.toString());
+    // System.out.println(borders.get(coord).toString());
+    // }
   }
 }

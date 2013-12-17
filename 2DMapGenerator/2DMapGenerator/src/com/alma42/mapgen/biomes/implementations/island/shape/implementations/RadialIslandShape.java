@@ -1,11 +1,11 @@
 /**
  * 
  */
-package com.alma42.mapgen.island_shape.implementations;
+package com.alma42.mapgen.biomes.implementations.island.shape.implementations;
 
 import java.util.Random;
 
-import com.alma42.mapgen.island_shape.IIslandShape;
+import com.alma42.mapgen.biomes.implementations.island.shape.IIslandShape;
 import com.alma42.mapgen.utils.geometry.Point;
 
 /**

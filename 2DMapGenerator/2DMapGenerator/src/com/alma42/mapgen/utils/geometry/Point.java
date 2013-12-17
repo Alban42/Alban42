@@ -19,6 +19,20 @@ public class Point {
     this.length = Math.sqrt((this.x * this.x) + (this.y * this.y));
   }
 
+  /**
+   * @return the x
+   */
+  public double getX() {
+    return this.x;
+  }
+
+  /**
+   * @return the y
+   */
+  public double getY() {
+    return this.y;
+  }
+
   public double l2() {
     return (this.x * this.x) + (this.y * this.y);
   }
@@ -36,4 +50,5 @@ public class Point {
   public String toString() {
     return "Point [x=" + this.x + ", y=" + this.y + "]";
   }
+
 }

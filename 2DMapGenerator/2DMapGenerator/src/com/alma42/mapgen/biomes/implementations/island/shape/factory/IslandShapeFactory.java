@@ -1,11 +1,11 @@
-package com.alma42.mapgen.factories;
+package com.alma42.mapgen.biomes.implementations.island.shape.factory;
 
 import java.util.Random;
 
-import com.alma42.mapgen.island_shape.IIslandShape;
-import com.alma42.mapgen.island_shape.implementations.BlobIslandShape;
-import com.alma42.mapgen.island_shape.implementations.RadialIslandShape;
-import com.alma42.mapgen.island_shape.implementations.SquareIslandShape;
+import com.alma42.mapgen.biomes.implementations.island.shape.IIslandShape;
+import com.alma42.mapgen.biomes.implementations.island.shape.implementations.BlobIslandShape;
+import com.alma42.mapgen.biomes.implementations.island.shape.implementations.RadialIslandShape;
+import com.alma42.mapgen.biomes.implementations.island.shape.implementations.SquareIslandShape;
 
 public class IslandShapeFactory {
 

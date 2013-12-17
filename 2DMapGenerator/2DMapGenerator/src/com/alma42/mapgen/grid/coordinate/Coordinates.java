@@ -3,21 +3,29 @@ package com.alma42.mapgen.grid.coordinate;
 public class Coordinates {
 
   public enum Position {
-    N, NE, E, SE, S, SW, W, NW, R, L;
+    A(-1), N(0), NE(0.5), E(1), SE(1.5), S(2), SW(2.5), W(3), NW(3.5);
+    double value;
+
+    Position(final double value) {
+      this.value = value;
+    }
+
+    public double getValue() {
+      return this.value;
+    }
+
   }
 
-  private final double x;
-  private final double y;
-  private Position     position;
+  private final double   x;
+  private final double   y;
+  private final Position position;
 
   /**
    * @param x
    * @param y
    */
   public Coordinates(final double x, final double y) {
-    this.x = x;
-    this.y = y;
-    this.position = null;
+    this(x, y, Position.A);
   }
 
   /**
@@ -25,7 +33,8 @@ public class Coordinates {
    * @param y
    */
   public Coordinates(final double x, final double y, final Position position) {
-    this(x, y);
+    this.x = x;
+    this.y = y;
     this.position = position;
   }
 
@@ -46,10 +55,13 @@ public class Coordinates {
       return false;
     }
     final Coordinates other = (Coordinates) obj;
-    if (this.x != other.x) {
+    // if (this.position != other.position) {
+    // return false;
+    // }
+    if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(other.x)) {
       return false;
     }
-    if (this.y != other.y) {
+    if (Double.doubleToLongBits(this.y) != Double.doubleToLongBits(other.y)) {
       return false;
     }
     return true;
@@ -83,8 +95,15 @@ public class Coordinates {
    */
   @Override
   public int hashCode() {
-    final String result = String.valueOf(getX()) + String.valueOf(getY());
-    return Integer.valueOf(result);
+    final int prime = 31;
+    int result = 1;
+    result = (prime * result) + ((this.position == null) ? 0 : this.position.hashCode());
+    long temp;
+    temp = Double.doubleToLongBits(this.x);
+    result = (prime * result) + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.y);
+    result = (prime * result) + (int) (temp ^ (temp >>> 32));
+    return result;
   }
 
   /*
@@ -94,7 +113,7 @@ public class Coordinates {
    */
   @Override
   public String toString() {
-    return "ACoordinates [x=" + this.x + ", y=" + this.y + "]";
+    return "Coordinates [x=" + this.x + ", y=" + this.y + ", position=" + this.position + "]";
   }
 
 }
