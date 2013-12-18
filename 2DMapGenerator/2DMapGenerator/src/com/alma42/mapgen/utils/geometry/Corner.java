@@ -3,6 +3,8 @@ package com.alma42.mapgen.utils.geometry;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.alma42.mapgen.biomes.IProperties;
+import com.alma42.mapgen.biomes.factory.PropertiesFactory;
 import com.alma42.mapgen.grid.AGridComponent;
 import com.alma42.mapgen.grid.Grid;
 import com.alma42.mapgen.grid.coordinate.Coordinates;
@@ -15,17 +17,18 @@ import com.alma42.mapgen.grid.coordinate.Coordinates.Position;
  */
 public class Corner {
 
-  private static final double      GRID_UNIT = AGridComponent.GRID_UNIT;
+  private static final double              GRID_UNIT = AGridComponent.GRID_UNIT;
 
-  private final AGridComponent     parent;
-  private final Point              point;
-  private final Coordinates        coordinates;
+  private Map<Coordinates, Corner>         adjacents;
+  private boolean                          border;
+  private final Coordinates                coordinates;
 
-  private Map<Coordinates, Corner> adjacents;
+  private final AGridComponent             parent;
+  private final Point                      point;
 
-  private boolean                  border, water;
-
-  private double                   elevation;
+  private IProperties                      properties;
+  private int                              propertiesType;
+  private Map<Coordinates, AGridComponent> touches;
 
   public Corner(final AGridComponent parent, final Point point, final Coordinates coordinates) {
     this.parent = parent;
@@ -42,6 +45,17 @@ public class Corner {
       }
     }
     this.adjacents.put(coordinates, corner);
+  }
+
+  private void addTouche(final Grid gridParent, final Coordinates coordinates) {
+    AGridComponent component = null;
+    for (final AGridComponent tmpComponent : gridParent.getChilds().values()) {
+      if (tmpComponent.getCoordinates().equals(coordinates)) {
+        component = tmpComponent;
+        break;
+      }
+    }
+    this.touches.put(coordinates, component);
   }
 
   public Map<Coordinates, Corner> getAdjacents() {
@@ -68,18 +82,21 @@ public class Corner {
     return this.adjacents;
   }
 
+  public int getAdjacentsSize() {
+    int total = 0;
+    for (final Corner corner : getAdjacents().values()) {
+      if (corner != null) {
+        total++;
+      }
+    }
+    return total;
+  }
+
   /**
    * @return the coordinates
    */
   public Coordinates getCoordinates() {
     return this.coordinates;
-  }
-
-  /**
-   * @return the elevation
-   */
-  public double getElevation() {
-    return this.elevation;
   }
 
   private Grid getGridParent(final AGridComponent parent) {
@@ -107,18 +124,54 @@ public class Corner {
     return this.point;
   }
 
+  public IProperties getProperties() {
+    if (this.properties == null) {
+      this.properties = PropertiesFactory.createProperties(this.propertiesType);
+    }
+
+    return this.properties;
+  }
+
+  public Map<Coordinates, AGridComponent> getTouches() {
+    if (this.touches == null) {
+      this.touches = new TreeMap<Coordinates, AGridComponent>(this.parent.getCoordinateComparator());
+      final double px = this.coordinates.getX();
+      final double py = this.coordinates.getY();
+      Coordinates coordinates;
+      final Grid gridParent = getGridParent(this.parent);
+      final double gridUnit = GRID_UNIT / 2;
+
+      // North-East component
+      coordinates = new Coordinates(px + gridUnit, py - gridUnit, Position.NE);
+      addTouche(gridParent, coordinates);
+      // South-East component
+      coordinates = new Coordinates(px + gridUnit, py + gridUnit, Position.SE);
+      addTouche(gridParent, coordinates);
+      // South-West component
+      coordinates = new Coordinates(px - gridUnit, py + gridUnit, Position.SW);
+      addTouche(gridParent, coordinates);
+      // North-West component
+      coordinates = new Coordinates(px - gridUnit, py - gridUnit, Position.NW);
+      addTouche(gridParent, coordinates);
+    }
+    return this.touches;
+  }
+
+  public int getTouchesSize() {
+    int total = 0;
+    for (final AGridComponent component : getTouches().values()) {
+      if (component != null) {
+        total++;
+      }
+    }
+    return total;
+  }
+
   /**
    * @return the border
    */
   public boolean isBorder() {
     return this.border;
-  }
-
-  /**
-   * @return the water
-   */
-  public boolean isWater() {
-    return this.water;
   }
 
   /**
@@ -129,20 +182,8 @@ public class Corner {
     this.border = border;
   }
 
-  /**
-   * @param elevation
-   *          the elevation to set
-   */
-  public void setElevation(final double elevation) {
-    this.elevation = elevation;
-  }
-
-  /**
-   * @param water
-   *          the water to set
-   */
-  public void setWater(final boolean water) {
-    this.water = water;
+  public void setProperties(final int propertiesType) {
+    this.propertiesType = propertiesType;
   }
 
   /*
@@ -152,7 +193,8 @@ public class Corner {
    */
   @Override
   public String toString() {
-    return "Corner [coordinates=" + this.coordinates + ", point=" + this.point + "]";
+    return "Corner [coordinates=" + this.coordinates + ", point=" + this.point + ", border="
+        + this.border + "]";
   }
 
 }

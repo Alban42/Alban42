@@ -1,6 +1,5 @@
 package com.alma42.mapgen;
 
-import java.util.Map;
 import java.util.Random;
 
 import com.alma42.mapgen.biomes.factory.BiomeManagerFactory;
@@ -8,7 +7,6 @@ import com.alma42.mapgen.biomes.implementations.island.shape.IIslandShape;
 import com.alma42.mapgen.biomes.implementations.island.shape.factory.IslandShapeFactory;
 import com.alma42.mapgen.grid.AGridComponent;
 import com.alma42.mapgen.grid.Grid;
-import com.alma42.mapgen.grid.coordinate.Coordinates;
 import com.alma42.mapgen.utils.geometry.Corner;
 import com.alma42.mapgen.utils.geometry.Point;
 
@@ -20,7 +18,33 @@ public class Test2 {
   }
 
   public static void main(final String[] args) {
-    testMapGen();
+    final int size = 100;
+    final int shapeNumber = 10000;
+    final int biomeManagerType = BiomeManagerFactory.ISLAND;
+
+    // testMapGen();
+    final com.alma42.mapgen.Map map = new com.alma42.mapgen.Map(size, shapeNumber, biomeManagerType);
+    map.createMap();
+    // for (final AGridComponent child : map.getGrid().getChilds().values()) {
+    // System.out.println(child.getCoordinates().toString());
+    // for (final Corner corner : child.getCorners().values()) {
+    // System.out.println("\t - " + corner.toString());
+    // }
+    // System.out.println(child.getProperties().toString());
+    // }
+
+    double x = -1;
+    String result = "";
+    for (final AGridComponent child : map.getGrid().getChilds().values()) {
+      if (child.getCoordinates().getX() != x) {
+        result += "\n";
+        x = child.getCoordinates().getX();
+      }
+
+      result += map.getBiomeManager().getBiome(child).getValue();
+    }
+
+    System.out.println(result);
   }
 
   private static void testMapGen() {
@@ -50,15 +74,28 @@ public class Test2 {
       }
     }
 
-    System.out.println(result);
-    final AGridComponent child = grid.getChild(new Coordinates(1, 1));
-    System.out.println("CHILD : " + child.toString());
-    final Map<Coordinates, Corner> corners = child.getCorners();
-    System.out.println("CORNERS : " + corners.values().toString());
-    for (final Coordinates coord : corners.keySet()) {
-      System.out.print("Coordinates : " + coord.toString());
-      System.out.println(corners.get(coord).getAdjacents().toString());
+    for (final Corner child : grid.getAllCorners()) {
+      if (child.getCoordinates().getX() != x) {
+        result += "\n";
+        x = child.getCoordinates().getX();
+      }
+
+      if (isInside(islandShape, child.getPoint())) {
+        result += "L";
+      } else {
+        result += "W";
+      }
     }
+
+    System.out.println(result);
+    // final AGridComponent child = grid.getChild(new Coordinates(1, 1));
+    // System.out.println("CHILD : " + child.toString());
+    // final Map<Coordinates, Corner> corners = child.getCorners();
+    // System.out.println("CORNERS : " + corners.values().toString());
+    // for (final Coordinates coord : corners.keySet()) {
+    // System.out.print("Coordinates : " + coord.toString());
+    // System.out.println(corners.get(coord).getAdjacents().toString());
+    // }
     // System.out.println("CORNERS : " + corners.toString());
     // final Map<Coordinates, AGridComponent> neighbors = child.getNeighbors();
     // System.out.println("NEIGHBORS : " + neighbors.toString());
