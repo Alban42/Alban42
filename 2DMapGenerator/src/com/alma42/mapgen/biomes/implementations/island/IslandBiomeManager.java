@@ -9,13 +9,14 @@ import java.util.Random;
 import com.alma42.mapgen.biomes.ABiomeManager;
 import com.alma42.mapgen.biomes.IBiome;
 import com.alma42.mapgen.biomes.factory.PropertiesFactory;
-import com.alma42.mapgen.biomes.implementations.island.IslandStringBiome.StringData;
+import com.alma42.mapgen.biomes.implementations.island.IslandBiome.ColorData;
 import com.alma42.mapgen.biomes.implementations.island.comparator.LocationComparator;
 import com.alma42.mapgen.biomes.implementations.island.comparator.MoistureComparator;
 import com.alma42.mapgen.biomes.implementations.island.shape.IIslandShape;
 import com.alma42.mapgen.biomes.implementations.island.shape.factory.IslandShapeFactory;
 import com.alma42.mapgen.grid.AGridComponent;
 import com.alma42.mapgen.grid.Grid;
+import com.alma42.mapgen.grid.shape.Shape;
 import com.alma42.mapgen.utils.geometry.Corner;
 import com.alma42.mapgen.utils.geometry.Point;
 
@@ -358,6 +359,14 @@ public class IslandBiomeManager extends ABiomeManager {
     this.islandShape = IslandShapeFactory.createIslandShape(SHAPE, random, size);
   }
 
+  private void assignBiomes(final Grid grid) {
+    for (final AGridComponent child : grid.getChilds().values()) {
+      if (child instanceof Shape) {
+        ((Shape) child).setBiome(getBiome(child));
+      }
+    }
+  }
+
   /**
    * Determine elevations and water at Voronoi corners. By construction, we have no local minima. This is important for
    * the downslope vectors later, which are used in the river construction algorithm. Also by construction, inlets/bays
@@ -457,88 +466,88 @@ public class IslandBiomeManager extends ABiomeManager {
     calculateDownslopes(grid);
     System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
 
-    // System.out.println("Assign Watersheds ...");
-    // startedTime = System.currentTimeMillis();
-    // // Determine watersheds: for every corner, where does it flow
-    // // out into the ocean?
-    // calculateWatersheds(grid);
-    // System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
-    //
-    // // Create rivers.
-    // // System.out.println("Create River ...");
-    // // createRivers();
-    //
-    // // Determine moisture at corners, starting at rivers
-    // // and lakes, but not oceans. Then redistribute
-    // // moisture to cover the entire range evenly from 0.0
-    // // to 1.0. Then assign polygon moisture as the average
-    // // of the corner moisture.
-    // System.out.println("Assign Corner Moisture ...");
-    // startedTime = System.currentTimeMillis();
-    // assignCornerMoisture(grid);
-    // redistributeMoisture(landCorners(grid.getAllCorners()));
-    // System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
-    //
-    // System.out.println("Assign moisture ...");
-    // startedTime = System.currentTimeMillis();
-    // assignMoisture(grid);
-    // System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
-    // // System.out.println("Assign biomes ...");
-    // // assignBiomes();
+    System.out.println("Assign Watersheds ...");
+    startedTime = System.currentTimeMillis();
+    // Determine watersheds: for every corner, where does it flow
+    // out into the ocean?
+    calculateWatersheds(grid);
+    System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
+
+    // Create rivers.
+    // System.out.println("Create River ...");
+    // createRivers();
+
+    // Determine moisture at corners, starting at rivers
+    // and lakes, but not oceans. Then redistribute
+    // moisture to cover the entire range evenly from 0.0
+    // to 1.0. Then assign polygon moisture as the average
+    // of the corner moisture.
+    System.out.println("Assign Corner Moisture ...");
+    startedTime = System.currentTimeMillis();
+    assignCornerMoisture(grid);
+    redistributeMoisture(landCorners(grid.getAllCorners()));
+    System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
+
+    System.out.println("Assign moisture ...");
+    startedTime = System.currentTimeMillis();
+    assignMoisture(grid);
+    System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
+    // System.out.println("Assign biomes ...");
+    assignBiomes(grid);
   }
 
   @Override
-  public IBiome<String> getBiome(final AGridComponent gridComponent) {
-    IBiome<String> biome = null;
+  public IBiome<Integer> getBiome(final AGridComponent gridComponent) {
+    IBiome<Integer> biome = null;
     if (getProperties(gridComponent).isOcean()) {
-      biome = new IslandStringBiome(StringData.OCEAN);
+      biome = new IslandBiome(ColorData.OCEAN);
     } else if (getProperties(gridComponent).isWater()) {
       if (getProperties(gridComponent).getElevation() < 0.1) {
-        biome = new IslandStringBiome(StringData.MARSH);
+        biome = new IslandBiome(ColorData.MARSH);
       }
       if (getProperties(gridComponent).getElevation() > 0.8) {
-        biome = new IslandStringBiome(StringData.ICE);
+        biome = new IslandBiome(ColorData.ICE);
       }
-      biome = new IslandStringBiome(StringData.LAKE);
+      biome = new IslandBiome(ColorData.LAKE);
     } else if (getProperties(gridComponent).isCoast()) {
-      biome = new IslandStringBiome(StringData.BEACH);
+      biome = new IslandBiome(ColorData.BEACH);
     } else if (getProperties(gridComponent).getElevation() > 0.8) {
       if (getProperties(gridComponent).getMoisture() > 0.50) {
-        biome = new IslandStringBiome(StringData.SNOW);
+        biome = new IslandBiome(ColorData.SNOW);
       } else if (getProperties(gridComponent).getMoisture() > 0.33) {
-        biome = new IslandStringBiome(StringData.TUNDRA);
+        biome = new IslandBiome(ColorData.TUNDRA);
       } else if (getProperties(gridComponent).getMoisture() > 0.16) {
-        biome = new IslandStringBiome(StringData.BARE);
+        biome = new IslandBiome(ColorData.BARE);
       } else {
-        biome = new IslandStringBiome(StringData.SCORCHED);
+        biome = new IslandBiome(ColorData.SCORCHED);
       }
     } else if (getProperties(gridComponent).getElevation() > 0.6) {
       if (getProperties(gridComponent).getMoisture() > 0.66) {
-        biome = new IslandStringBiome(StringData.TAIGA);
+        biome = new IslandBiome(ColorData.TAIGA);
       } else if (getProperties(gridComponent).getMoisture() > 0.33) {
-        biome = new IslandStringBiome(StringData.SHRUBLAND);
+        biome = new IslandBiome(ColorData.SHRUBLAND);
       } else {
-        biome = new IslandStringBiome(StringData.TEMPERATE_DESERT);
+        biome = new IslandBiome(ColorData.TEMPERATE_DESERT);
       }
     } else if (getProperties(gridComponent).getElevation() > 0.3) {
       if (getProperties(gridComponent).getMoisture() > 0.83) {
-        biome = new IslandStringBiome(StringData.TEMPERATE_RAIN_FOREST);
+        biome = new IslandBiome(ColorData.TEMPERATE_RAIN_FOREST);
       } else if (getProperties(gridComponent).getMoisture() > 0.50) {
-        biome = new IslandStringBiome(StringData.TEMPERATE_DECIDUOUS_FOREST);
+        biome = new IslandBiome(ColorData.TEMPERATE_DECIDUOUS_FOREST);
       } else if (getProperties(gridComponent).getMoisture() > 0.16) {
-        biome = new IslandStringBiome(StringData.GRASSLAND);
+        biome = new IslandBiome(ColorData.GRASSLAND);
       } else {
-        biome = new IslandStringBiome(StringData.TEMPERATE_DESERT);
+        biome = new IslandBiome(ColorData.TEMPERATE_DESERT);
       }
     } else {
       if (getProperties(gridComponent).getMoisture() > 0.66) {
-        biome = new IslandStringBiome(StringData.TROPICAL_RAIN_FOREST);
+        biome = new IslandBiome(ColorData.TROPICAL_RAIN_FOREST);
       } else if (getProperties(gridComponent).getMoisture() > 0.33) {
-        biome = new IslandStringBiome(StringData.TROPICAL_SEASONAL_FOREST);
+        biome = new IslandBiome(ColorData.TROPICAL_SEASONAL_FOREST);
       } else if (getProperties(gridComponent).getMoisture() > 0.16) {
-        biome = new IslandStringBiome(StringData.GRASSLAND);
+        biome = new IslandBiome(ColorData.GRASSLAND);
       } else {
-        biome = new IslandStringBiome(StringData.SUBTROPICAL_DESERT);
+        biome = new IslandBiome(ColorData.SUBTROPICAL_DESERT);
       }
     }
     return biome;

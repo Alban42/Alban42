@@ -1,66 +1,66 @@
 package com.alma42.mapgen;
 
+import com.alma42.mapgen.game.WorldController;
+import com.alma42.mapgen.game.WorldRenderer;
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class MapGeneratorUI implements ApplicationListener {
-	private OrthographicCamera camera;
-	private SpriteBatch batch;
-	private Texture texture;
-	private Sprite sprite;
-	
-	@Override
-	public void create() {		
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-		
-		camera = new OrthographicCamera(1, h/w);
-		batch = new SpriteBatch();
-		
-		texture = new Texture(Gdx.files.internal("data/libgdx.png"));
-		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		
-		TextureRegion region = new TextureRegion(texture, 0, 0, 512, 275);
-		
-		sprite = new Sprite(region);
-		sprite.setSize(0.9f, 0.9f * sprite.getHeight() / sprite.getWidth());
-		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
-		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
-	}
+  private static final String TAG = MapGeneratorUI.class.getName();
 
-	@Override
-	public void dispose() {
-		batch.dispose();
-		texture.dispose();
-	}
+  private boolean             paused;
+  private WorldController     worldController;
 
-	@Override
-	public void render() {		
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		sprite.draw(batch);
-		batch.end();
-	}
+  private WorldRenderer       worldRenderer;
 
-	@Override
-	public void resize(int width, int height) {
-	}
+  @Override
+  public void create() {
+    // Set Libgdx log level to DEBUG
+    Gdx.app.setLogLevel(Application.LOG_DEBUG);
+    // Load assets
+    // Assets.instance.init(new AssetManager());
+    // Initialize controller and renderer
+    this.worldController = new WorldController();
+    this.worldRenderer = new WorldRenderer(this.worldController);
+  }
 
-	@Override
-	public void pause() {
-	}
+  @Override
+  public void dispose() {
+    this.worldRenderer.dispose();
+    // Assets.instance.dispose();
+  }
 
-	@Override
-	public void resume() {
-	}
+  @Override
+  public void pause() {
+    this.paused = true;
+  }
+
+  @Override
+  public void render() {
+    // Do not update game world when paused.
+    if (!this.paused) {
+      // Update game world by the time that has passed
+      // since last rendered frame.
+      this.worldController.update(Gdx.graphics.getDeltaTime());
+    }
+    // Sets the clear screen color to: Cornflower Blue
+    Gdx.gl.glClearColor(0x64 / 255.0f, 0x95 / 255.0f, 0xed / 255.0f, 0xff / 255.0f);
+    // Clears the screen
+    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+    // Render game world to screen
+    this.worldRenderer.render();
+  }
+
+  @Override
+  public void resize(final int width, final int height) {
+    this.worldRenderer.resize(width, height);
+  }
+
+  @Override
+  public void resume() {
+    // Assets.instance.init(new AssetManager());
+    this.paused = false;
+  }
 }
