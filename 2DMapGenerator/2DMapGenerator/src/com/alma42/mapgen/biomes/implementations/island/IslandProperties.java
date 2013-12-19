@@ -15,6 +15,7 @@ public class IslandProperties implements IProperties {
   private boolean border, ocean, water, corner, coast;
   private Corner  downslope, watershed;
   private double  elevation, moisture;
+  private int     watershedSize, river;
 
   /**
    * @return the downslope
@@ -38,10 +39,24 @@ public class IslandProperties implements IProperties {
   }
 
   /**
+   * @return the river
+   */
+  public int getRiver() {
+    return this.river;
+  }
+
+  /**
    * @return the watershed
    */
   public Corner getWatershed() {
     return this.watershed;
+  }
+
+  /**
+   * @return the whatershedSize
+   */
+  public int getWatershedSize() {
+    return this.watershedSize;
   }
 
   /**
@@ -136,6 +151,14 @@ public class IslandProperties implements IProperties {
   }
 
   /**
+   * @param river
+   *          the river to set
+   */
+  public void setRiver(final int river) {
+    this.river = river;
+  }
+
+  /**
    * @param water
    *          the water to set
    */
@@ -149,6 +172,14 @@ public class IslandProperties implements IProperties {
    */
   public void setWatershed(final Corner watershed) {
     this.watershed = watershed;
+  }
+
+  /**
+   * @param watershedSize
+   *          the watershedSize to set
+   */
+  public void setWatershedSize(final int watershedSize) {
+    this.watershedSize = watershedSize;
   }
 
   /*

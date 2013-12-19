@@ -11,6 +11,7 @@ import com.alma42.mapgen.biomes.IBiome;
 import com.alma42.mapgen.biomes.factory.PropertiesFactory;
 import com.alma42.mapgen.biomes.implementations.island.IslandStringBiome.StringData;
 import com.alma42.mapgen.biomes.implementations.island.comparator.LocationComparator;
+import com.alma42.mapgen.biomes.implementations.island.comparator.MoistureComparator;
 import com.alma42.mapgen.biomes.implementations.island.shape.IIslandShape;
 import com.alma42.mapgen.biomes.implementations.island.shape.factory.IslandShapeFactory;
 import com.alma42.mapgen.grid.AGridComponent;
@@ -27,20 +28,90 @@ public class IslandBiomeManager extends ABiomeManager {
   private static final int   PROPERTIES     = PropertiesFactory.ISLAND;
   private static final int   SHAPE          = IslandShapeFactory.RADIAL;
 
+  /**
+   * Calculate moisture. Freshwater sources spread moisture: rivers and lakes (not oceans). Saltwater sources have
+   * moisture but do not spread it (we set it at the end, after propagation).
+   */
+  private static void assignCornerMoisture(final Grid grid) {
+    double newMoisture;
+    final LinkedList<Corner> queue = new LinkedList<Corner>();
+    // Fresh water
+    for (final Corner corner : grid.getAllCorners()) {
+      if (corner != null) {
+        if ((getProperties(corner).isWater() || (getProperties(corner).getRiver() > 0))
+            && !getProperties(corner).isOcean()) {
+          getProperties(corner).setMoisture(
+              getProperties(corner).getRiver() > 0 ? Math.min(3.0, (0.2 * getProperties(corner).getRiver())) : 1.0);
+          queue.add(corner);
+        } else {
+          getProperties(corner).setMoisture(0.0);
+        }
+      }
+    }
+
+    while (!queue.isEmpty()) {
+      final Corner corner = queue.pop();
+      for (final Corner adjacentCorner : corner.getAdjacents().values()) {
+        if (adjacentCorner != null) {
+          newMoisture = getProperties(corner).getMoisture() * 0.9;
+          if (newMoisture > getProperties(adjacentCorner).getMoisture()) {
+            getProperties(adjacentCorner).setMoisture(newMoisture);
+            queue.add(adjacentCorner);
+          }
+        }
+      }
+    }
+
+    // Salt water
+    for (final Corner corner : grid.getAllCorners()) {
+      if (corner != null) {
+        if (getProperties(corner).isOcean() || getProperties(corner).isCoast()) {
+          getProperties(corner).setMoisture(1.0);
+        }
+      }
+    }
+  }
+
   /** Polygon elevations are the average of the elevations of their corners. */
   private static void assignElevations(final Grid grid) {
     double sumElevation;
     int sumCorners;
     for (final AGridComponent child : grid.getChilds().values()) {
-      sumElevation = 0.0;
-      sumCorners = 0;
-      for (final Corner corner : child.getCorners().values()) {
-        if (corner != null) {
-          sumCorners++;
-          sumElevation += getProperties(corner).getElevation();
+      if (child != null) {
+        sumElevation = 0.0;
+        sumCorners = 0;
+        for (final Corner corner : child.getCorners().values()) {
+          if (corner != null) {
+            sumCorners++;
+            sumElevation += getProperties(corner).getElevation();
+          }
         }
+        getProperties(child).setElevation(sumElevation / sumCorners);
       }
-      getProperties(child).setElevation(sumElevation / sumCorners);
+    }
+  }
+
+  /**
+   * Polygon moisture is the average of the moisture at corners
+   */
+  private static void assignMoisture(final Grid grid) {
+    double sumMoisture, cornerSize;
+    for (final AGridComponent component : grid.getChilds().values()) {
+      if (component != null) {
+        sumMoisture = 0.0;
+        cornerSize = 0.0;
+        for (final Corner q : component.getCorners().values()) {
+          if (q != null) {
+            if (getProperties(q).getMoisture() > 1.0) {
+              getProperties(q).setMoisture(1.0);
+            }
+            sumMoisture += getProperties(q).getMoisture();
+            cornerSize++;
+          }
+
+        }
+        getProperties(component).setMoisture(sumMoisture / cornerSize);
+      }
     }
   }
 
@@ -157,6 +228,55 @@ public class IslandBiomeManager extends ABiomeManager {
     }
   }
 
+  /**
+   * Calculate the watershed of every land point. The watershed is the last downstream land point in the downslope
+   * graph. TODO: watersheds are currently calculated on corners, but it'd be more useful to compute them on polygon
+   * centers so that every polygon can be marked as being in one watershed.
+   */
+  private static void calculateWatersheds(final Grid grid) {
+    boolean changed;
+    Corner cornerTMP;
+    // Initially the watershed pointer points downslope one step.
+    for (final Corner corner : grid.getAllCorners()) {
+      if (corner != null) {
+        getProperties(corner).setWatershed(corner);
+        if (!getProperties(corner).isOcean() && !getProperties(corner).isCoast()) {
+          getProperties(corner).setWatershed(getProperties(corner).getDownslope());
+        }
+      }
+    }
+    // Follow the downslope pointers to the coast. Limit to 100
+    // iterations although most of the time with numPoints==2000 it
+    // only takes 20 iterations because most points are not far from
+    // a coast. TODO: can run faster by looking at
+    // p.watershed.watershed instead of p.downslope.watershed.
+    for (int i = 0; i < 100; i++) {
+      changed = false;
+      for (final Corner corner : grid.getAllCorners()) {
+        if (corner != null) {
+          if (!getProperties(corner).isOcean() && !getProperties(corner).isCoast()
+              && !getProperties(getProperties(corner).getWatershed()).isCoast()) {
+            cornerTMP = getProperties(getProperties(corner).getDownslope()).getWatershed();
+            if (!getProperties(cornerTMP).isOcean()) {
+              getProperties(corner).setWatershed(cornerTMP);
+            }
+            changed = true;
+          }
+        }
+      }
+      if (!changed) {
+        break;
+      }
+    }
+    // How big is each watershed?
+    for (final Corner corner : grid.getAllCorners()) {
+      if (corner != null) {
+        cornerTMP = getProperties(corner).getWatershed();
+        getProperties(cornerTMP).setWatershedSize(1 + getProperties(cornerTMP).getWatershedSize());
+      }
+    }
+  }
+
   public static IslandProperties getProperties(final AGridComponent component) {
     return ((IslandProperties) component.getProperties());
   }
@@ -199,7 +319,7 @@ public class IslandBiomeManager extends ABiomeManager {
       // Let y(x) be the total area that we want at elevation <= x.
       // We want the higher elevations to occur less than lower
       // ones, and set the area to be y(x) = 1 - (1-x)^2.
-      y = i / (locations.size());
+      y = (double) i / (locations.size());
       // Now we have to solve for x, given the known y.
       // * y = 1 - (1-x)^2
       // * y = 1 - (1 - 2x + x^2)
@@ -212,9 +332,19 @@ public class IslandBiomeManager extends ABiomeManager {
     }
 
     for (final Corner corner : corners) {
-      if (getProperties(corner).isOcean() || getProperties(corner).isCoast()) {
-        getProperties(corner).setElevation(0.0);
+      if (corner != null) {
+        if (getProperties(corner).isOcean() || getProperties(corner).isCoast()) {
+          getProperties(corner).setElevation(0.0);
+        }
       }
+    }
+  }
+
+  // Change the overall distribution of moisture to be evenly distributed.
+  private static void redistributeMoisture(final ArrayList<Corner> locations) {
+    Collections.sort(locations, new MoistureComparator());
+    for (int i = 0; i < locations.size(); i++) {
+      getProperties(locations.get(i)).setMoisture((double) i / (locations.size()));
     }
   }
 
@@ -238,13 +368,15 @@ public class IslandBiomeManager extends ABiomeManager {
     double newElevation;
     final LinkedList<Corner> queue = new LinkedList<Corner>();
     for (final Corner corner : grid.getAllCorners()) {
-      getProperties(corner).setWater(!isInside(corner.getPoint()));
-      // The edges of the map are elevation 0
-      if (corner.isBorder()) {
-        getProperties(corner).setElevation(0.0);
-        queue.add(corner);
-      } else {
-        getProperties(corner).setElevation(Double.MAX_VALUE);
+      if (corner != null) {
+        getProperties(corner).setWater(!isInside(corner.getPoint()));
+        // The edges of the map are elevation 0
+        if (corner.isBorder()) {
+          getProperties(corner).setElevation(0.0);
+          queue.add(corner);
+        } else {
+          getProperties(corner).setElevation(Double.MAX_VALUE);
+        }
       }
     }
 
@@ -287,12 +419,19 @@ public class IslandBiomeManager extends ABiomeManager {
     if (!(this.gridComponent instanceof Grid)) {
       throw new ClassCastException("The gridComponent must be an instance of " + Grid.class.getName());
     }
+    long startedTime = System.currentTimeMillis();
     final Grid grid = (Grid) this.gridComponent;
     // Determine the elevations and water at corners.
+    System.out.println("Assign Corner Elevations ...");
+    startedTime = System.currentTimeMillis();
     assignCornerElevations(grid);
+    System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
 
     // Determine polygon and corner type: ocean, coast, land.
+    System.out.println("Assign Ocean and Coast... ");
+    startedTime = System.currentTimeMillis();
     assignOceanCoastAndLand(grid);
+    System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
 
     // Rescale elevations so that the highest is 1.0, and they're
     // distributed well. We want lower elevations to be more common
@@ -301,35 +440,51 @@ public class IslandBiomeManager extends ABiomeManager {
     // largest ring around the island, and therefore should more
     // land area than the highest elevation, which is the very
     // center of a perfectly circular island.
+    System.out.println("Redistribute Elevations ... ");
+    startedTime = System.currentTimeMillis();
     redistributeElevations(grid.getAllCorners());
+    System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
 
     // Polygon elevations are the average of their corners
+    System.out.println("Assign Elevations ... ");
+    startedTime = System.currentTimeMillis();
     assignElevations(grid);
+    System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
 
-    // System.out.println("Assign downslopes ...");
+    System.out.println("Assign downslopes ...");
+    startedTime = System.currentTimeMillis();
     // Determine downslope paths.
     calculateDownslopes(grid);
+    System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
 
-    // Determine watersheds: for every corner, where does it flow
-    // out into the ocean?
-    // calculateWatersheds();
-
-    // Create rivers.
-    // System.out.println("Create River ...");
-    // createRivers();
-
-    // Determine moisture at corners, starting at rivers
-    // and lakes, but not oceans. Then redistribute
-    // moisture to cover the entire range evenly from 0.0
-    // to 1.0. Then assign polygon moisture as the average
-    // of the corner moisture.
-    // assignCornerMoisture();
-    // redistributeMoisture(landCorners(this.graph.getCorners()));
-
+    // System.out.println("Assign Watersheds ...");
+    // startedTime = System.currentTimeMillis();
+    // // Determine watersheds: for every corner, where does it flow
+    // // out into the ocean?
+    // calculateWatersheds(grid);
+    // System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
+    //
+    // // Create rivers.
+    // // System.out.println("Create River ...");
+    // // createRivers();
+    //
+    // // Determine moisture at corners, starting at rivers
+    // // and lakes, but not oceans. Then redistribute
+    // // moisture to cover the entire range evenly from 0.0
+    // // to 1.0. Then assign polygon moisture as the average
+    // // of the corner moisture.
+    // System.out.println("Assign Corner Moisture ...");
+    // startedTime = System.currentTimeMillis();
+    // assignCornerMoisture(grid);
+    // redistributeMoisture(landCorners(grid.getAllCorners()));
+    // System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
+    //
     // System.out.println("Assign moisture ...");
-    // assignMoisture();
-    // System.out.println("Assign biomes ...");
-    // assignBiomes();
+    // startedTime = System.currentTimeMillis();
+    // assignMoisture(grid);
+    // System.out.println("\t - Time : " + ((System.currentTimeMillis() - startedTime) / 1000));
+    // // System.out.println("Assign biomes ...");
+    // // assignBiomes();
   }
 
   @Override

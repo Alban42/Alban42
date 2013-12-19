@@ -18,7 +18,7 @@ public class Test2 {
   }
 
   public static void main(final String[] args) {
-    final int size = 100;
+    final int size = 1000;
     final int shapeNumber = 10000;
     final int biomeManagerType = BiomeManagerFactory.ISLAND;
 
@@ -49,7 +49,7 @@ public class Test2 {
 
   private static void testMapGen() {
     final int size = 100;
-    final int shapeNumber = 10000;
+    final int shapeNumber = 100;
     final int seed = (int) System.nanoTime();
     final int islandShapeType = IslandShapeFactory.RADIAL;
     final int biomeManagerType = BiomeManagerFactory.ISLAND;

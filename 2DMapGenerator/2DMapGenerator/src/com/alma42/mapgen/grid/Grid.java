@@ -1,6 +1,6 @@
 package com.alma42.mapgen.grid;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,7 +30,7 @@ public class Grid extends AGridComponent {
 
   public List<Corner> getAllCorners() {
     if (this.allCorners == null) {
-      this.allCorners = new LinkedList<Corner>();
+      this.allCorners = new ArrayList<Corner>();
       for (final AGridComponent component : getChilds().values()) {
         this.allCorners.addAll(component.getCorners().values());
       }
