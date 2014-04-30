@@ -2,10 +2,10 @@ package com.alma42.mapgen.factories;
 
 import java.util.Random;
 
-import com.alma42.mapgen.zone.selectors.IPointSelector;
-import com.alma42.mapgen.zone.selectors.implemtations.HexagonZoneSelector;
-import com.alma42.mapgen.zone.selectors.implemtations.RandomZoneSelector;
-import com.alma42.mapgen.zone.selectors.implemtations.SquareZoneSelector;
+import com.alma42.mapgen.point.IPointSelector;
+import com.alma42.mapgen.point.implemtations.HexagonZoneSelector;
+import com.alma42.mapgen.point.implemtations.RandomZoneSelector;
+import com.alma42.mapgen.point.implemtations.SquareZoneSelector;
 
 public class PointSelectorFactory {
 

@@ -3,6 +3,7 @@ package com.alma42.mapgen.factories;
 import java.util.Random;
 
 import com.alma42.mapgen.island_shape.IIslandShape;
+import com.alma42.mapgen.island_shape.implementations.BlobIslandShape;
 import com.alma42.mapgen.island_shape.implementations.PerlinIslandShape;
 import com.alma42.mapgen.island_shape.implementations.RadialIslandShape;
 import com.alma42.mapgen.island_shape.implementations.SquareIslandShape;
@@ -12,6 +13,7 @@ public class IslandShapeFactory {
   public final static int PERLIN = 0;
   public final static int RADIAL = 1;
   public final static int SQUARE = 2;
+  public final static int BLOB   = 3;
 
   private IslandShapeFactory() {
 
@@ -28,6 +30,9 @@ public class IslandShapeFactory {
         break;
       case RADIAL:
         islandShape = new RadialIslandShape(seed);
+        break;
+      case BLOB:
+        islandShape = new BlobIslandShape();
         break;
       default:
         break;

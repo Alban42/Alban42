@@ -6,6 +6,7 @@ import com.alma42.mapgen.utils.geometry.Center;
 import com.alma42.mapgen.utils.geometry.Corner;
 import com.alma42.mapgen.utils.geometry.Edge;
 import com.alma42.mapgen.utils.geometry.Point;
+import com.alma42.mapgen.utils.geometry.Rectangle;
 
 public interface IGraph {
 
@@ -16,4 +17,6 @@ public interface IGraph {
   public ArrayList<Corner> getCorners();
 
   public ArrayList<Edge> getEdges();
+
+  public Rectangle getBounds();
 }

@@ -47,11 +47,11 @@ public class Map {
   public Map(int size, int pointNumber, int seed, int pointSelectorType, int graphType, int islandShapeType,
       int riverCreatorType, int biomeManagerType) {
     this.size = size;
-    this.bounds = new Rectangle(0, 0, this.size, this.size);
 
     IZoneType zoneType = ZoneTypeFactory.createIsland(size, pointNumber, seed, pointSelectorType, graphType,
         islandShapeType, riverCreatorType, biomeManagerType);
     zoneType.createZone();
+    this.bounds = zoneType.getBounds();
     this.centers = zoneType.getGraph().getCenters();
     this.edges = zoneType.getGraph().getEdges();
     this.corners = zoneType.getGraph().getCorners();
@@ -77,12 +77,12 @@ public class Map {
     };
     frame.setTitle("java fortune");
     frame.setVisible(true);
-    frame.setSize(size + 50, size + 50);
+    frame.setSize(this.size + 50, this.size + 50);
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
   }
 
   // also records the area of each voronoi cell
-  public void paint(final Graphics2D g, final boolean drawBiomes,
+  private void paint(final Graphics2D g, final boolean drawBiomes,
       final boolean drawRivers, final boolean drawSites,
       final boolean drawCorners, final boolean drawDelaunay,
       final boolean drawVoronoi) {
@@ -98,20 +98,20 @@ public class Map {
     }
 
     // draw via triangles
-    for (final Center c : this.centers) {
+    for (final Center center : this.centers) {
       if (drawBiomes) {
-        g.setColor((Color) c.biome.getValue());
+        g.setColor((Color) center.biome.getValue());
       } else {
-        g.setColor(defaultColors[c.index]);
+        g.setColor(defaultColors[center.index]);
       }
 
       // only used if Center c is on the edge of the graph. allows for
       // completely filling in the outer polygons
       Corner edgeCorner1 = null;
       Corner edgeCorner2 = null;
-      c.area = 0;
-      for (final Center n : c.neighbors) {
-        final Edge e = edgeWithCenters(c, n);
+      center.area = 0;
+      for (final Center n : center.neighbors) {
+        final Edge e = edgeWithCenters(center, n);
 
         if (e.v0 == null) {
           // outermost voronoi edges aren't stored in the graph
@@ -132,10 +132,10 @@ public class Map {
           }
         }
 
-        drawTriangle(g, e.v0, e.v1, c);
-        c.area += Math.abs((c.point.x * (e.v0.point.y - e.v1.point.y))
-            + (e.v0.point.x * (e.v1.point.y - c.point.y))
-            + (e.v1.point.x * (c.point.y - e.v0.point.y))) / 2;
+        drawTriangle(g, e.v0, e.v1, center);
+        center.area += Math.abs((center.point.x * (e.v0.point.y - e.v1.point.y))
+            + (e.v0.point.x * (e.v1.point.y - center.point.y))
+            + (e.v1.point.x * (center.point.y - e.v0.point.y))) / 2;
       }
 
       // handle the missing triangle
@@ -149,12 +149,12 @@ public class Map {
          */
 
         if (closeEnough(edgeCorner1.point.x, edgeCorner2.point.x, 1)) {
-          drawTriangle(g, edgeCorner1, edgeCorner2, c);
+          drawTriangle(g, edgeCorner1, edgeCorner2, center);
         } else {
           final int[] x = new int[4];
           final int[] y = new int[4];
-          x[0] = (int) c.point.x;
-          y[0] = (int) c.point.y;
+          x[0] = (int) center.point.x;
+          y[0] = (int) center.point.y;
           x[1] = (int) edgeCorner1.point.x;
           y[1] = (int) edgeCorner1.point.y;
 
@@ -174,7 +174,7 @@ public class Map {
           y[3] = (int) edgeCorner2.point.y;
 
           g.fillPolygon(x, y, 4);
-          c.area += 0; // TODO: area of polygon given vertices
+          center.area += 0; // TODO: area of polygon given vertices
         }
       }
     }

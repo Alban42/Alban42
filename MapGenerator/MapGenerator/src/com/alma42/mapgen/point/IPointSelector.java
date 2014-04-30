@@ -1,4 +1,4 @@
-package com.alma42.mapgen.zone.selectors;
+package com.alma42.mapgen.point;
 
 import java.util.ArrayList;
 
